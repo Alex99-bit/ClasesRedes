@@ -1,0 +1,56 @@
+/* Estilos generales */
+body {
+    background-color: #1a1a1a; /* Fondo gris oscuro */
+    color: #ffffff; /* Texto blanco */
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Para centrar verticalmente */
+    margin: 0; /* Elimina el margen predeterminado del body */
+}
+
+.container {
+    max-width: 800px; /* Ancho máximo del contenido */
+}
+
+h2{
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ffffff;
+    padding: 8px; /* Reducción del tamaño del padding */
+    text-align: center;
+}
+
+th {
+    background-color: #454545; /* Gris más claro */
+    color: #ffffff;
+}
+
+tr:nth-child(even) {
+    background-color: #2d2d2d; /* Gris medio */
+}
+
+tr:nth-child(odd) {
+    background-color: #1a1a1a; /* Gris oscuro */
+}
+
+/* Colores neon */
+.neon-text {
+    text-shadow: 0 0 5px #6e0e0e, 0 0 10px #ffffff, 0 0 15px #6e0e0e;
+}
+
+.neon-border {
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    padding: 5px;
+    box-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff;
+}
