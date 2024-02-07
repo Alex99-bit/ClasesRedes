@@ -1,67 +1,38 @@
 <?php
+// Encabezados necesarios para hacer las solicitudes
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
 
+// Conexión a la base de datos
 require('conexion.php');
 
-// Configurar encabezados CORS para permitir solicitudes desde cualquier origen
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+// Manejo de solicitudes GET y POST
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Consulta para seleccionar todos los registros de la tabla player
+    $sql = "SELECT * FROM player";
+    $result = $conn->query($sql);
 
-// Verificar el método de solicitud
-$method = $_SERVER['REQUEST_METHOD'];
+    // Crear un array para almacenar los datos
+    $data = array();
 
-switch ($method) {
-    case 'GET':
-        // Obtener datos
-        if (isset($_GET['id'])) {
-            // Obtener un registro por ID
-            $id = $_GET['id'];
-            $result = $conn->query("SELECT * FROM players WHERE id = $id");
-        } else {
-            // Obtener todos los registros
-            $result = $conn->query("SELECT * FROM players");
-        }
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
+    // Verificar si hay resultados
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            // Agregar fila al array
             $data[] = $row;
         }
-        echo json_encode($data);
-        break;
+    }
 
-    case 'POST':
-        // Crear un nuevo registro
-        $data = json_decode(file_get_contents("php://input"), true);
-        $name = $data['name'];
-        $score = $data['score'];
-        $age = $data['age'];
-        $conn->query("INSERT INTO players (name, score, age) VALUES ('$name', $score, $age)");
-        echo json_encode(['message' => 'Registro creado con éxito']);
-        break;
+    // Cerrar la conexión
+    $conn->close();
 
-    case 'PUT':
-        // Actualizar un registro por ID
-        $id = $_GET['id'];
-        $data = json_decode(file_get_contents("php://input"), true);
-        $name = $data['name'];
-        $score = $data['score'];
-        $age = $data['age'];
-        $conn->query("UPDATE players SET name='$name', score=$score, age=$age WHERE id=$id");
-        echo json_encode(['message' => 'Registro actualizado con éxito']);
-        break;
-
-    case 'DELETE':
-        // Eliminar un registro por ID
-        $id = $_GET['id'];
-        $conn->query("DELETE FROM players WHERE id=$id");
-        echo json_encode(['message' => 'Registro eliminado con éxito']);
-        break;
-
-    default:
-        // Método no permitido
-        header("HTTP/1.1 405 Method Not Allowed");
-        echo json_encode(['error' => 'Método no permitido']);
-        break;
+    // Devolver los datos en formato JSON
+    header('Content-Type: application/json');
+    echo json_encode($data);
+} else {
+    // Manejar otros tipos de solicitudes aquí si es necesario
+    http_response_code(405); // Método no permitido
+    echo json_encode(array("message" => "Método no permitido"));
 }
-
-// Cerrar la conexión a la base de datos
-$conn->close();
+?>
