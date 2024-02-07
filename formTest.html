@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Management</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        
+        #playerList {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #playerList div {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Player Management</h1>
+
+    <!-- Formulario para agregar un nuevo jugador -->
+    <h2>Agregar Nuevo Jugador</h2>
+    <form id="addPlayerForm">
+        <label for="playerName">Nombre:</label>
+        <input type="text" id="playerName" name="playerName" required><br><br>
+
+        <label for="playerExp">Experiencia:</label>
+        <input type="number" id="playerExp" name="playerExp" required><br><br>
+
+        <label for="playerEdad">Edad:</label>
+        <input type="number" id="playerEdad" name="playerEdad" required><br><br>
+
+        <button type="submit">Agregar Jugador</button>
+    </form>
+
+    <!-- Contenedor para mostrar la lista de jugadores -->
+    <h2>Lista de Jugadores</h2>
+    <div id="playerList"></div>
+
+    <script>
+        // Función para validar los datos del formulario
+        function validateForm() {
+            var playerName = document.getElementById('playerName').value.trim();
+            var playerExp = document.getElementById('playerExp').value.trim();
+            var playerEdad = document.getElementById('playerEdad').value.trim();
+
+            // Validar que no haya campos vacíos
+            if (playerName === '' || playerExp === '' || playerEdad === '') {
+                alert('Por favor completa todos los campos.');
+                return false;
+            }
+
+            // Validar que la experiencia y la edad sean números positivos
+            if (playerExp <= 0 || playerEdad <= 0) {
+                alert('La experiencia y la edad deben ser números positivos.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Función para agregar un nuevo jugador
+        document.getElementById('addPlayerForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar que se envíe el formulario
+
+            // Validar el formulario antes de enviar los datos
+            if (!validateForm()) {
+                return; // Detener la ejecución si la validación falla
+            }
+
+            // Obtener los datos del formulario
+            var playerName = document.getElementById('playerName').value;
+            var playerExp = document.getElementById('playerExp').value;
+            var playerEdad = document.getElementById('playerEdad').value;
+
+            // Crear el objeto jugador
+            var player = {
+                playerName: playerName,
+                playerExp: playerExp,
+                playerEdad: playerEdad
+            };
+
+            // Enviar los datos del jugador al servidor
+            fetch('https://alejandrocodev.000webhostapp.com/postScore.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(player)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Mostrar mensaje de éxito
+                alert(data.message);
+                // Actualizar la lista de jugadores
+                getPlayerList();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Función para obtener y mostrar la lista de jugadores
+        function getPlayerList() {
+            fetch('https://alejandrocodev.000webhostapp.com/postScore.php')
+            .then(response => response.json())
+            .then(data => {
+                // Construir la lista de jugadores
+                var playerList = '';
+                data.forEach(player => {
+                    playerList += '<div>';
+                    playerList += '<strong>Nombre:</strong> ' + player.playerName + ', ';
+                    playerList += '<strong>Edad:</strong> ' + player.playerEdad + ', ';
+                    playerList += '<strong>Experiencia:</strong> ' + player.playerExp;
+                    playerList += '</div>';
+                });
+                // Mostrar la lista de jugadores en el contenedor correspondiente
+                document.getElementById('playerList').innerHTML = playerList;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Llamar a la función para obtener y mostrar la lista de jugadores al cargar la página
+        getPlayerList();
+    </script>
+</body>
+</html>
