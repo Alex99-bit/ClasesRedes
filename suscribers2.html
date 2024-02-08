@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <style>
+        body {
+            padding: 20px;
+        }
+        h1, h2 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>News Letter</h1>
+
+        <!-- Formulario para agregar un nuevo jugador -->
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Suscribete jugador</h2>
+                <form id="addPlayerForm">
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nacimiento">Fecha de nacimiento:</label>
+                        <input type="date" id="nacimiento" name="nacimiento" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contenedor para mostrar la lista de jugadores -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h2>Lista de Suscriptores</h2>
+                <div id="playerList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para validar los datos del formulario
+        function validateForm() {
+            var name = document.getElementById('name').value.trim();
+            var email = document.getElementById('email').value.trim();
+            var nacimiento = document.getElementById('nacimiento').value.trim();
+
+            // Validar que no haya campos vacíos
+            if (name === '' || email === '' || nacimiento === '') {
+                alert('Por favor completa todos los campos.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Función para agregar un nuevo jugador
+        document.getElementById('addPlayerForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar que se envíe el formulario
+
+            // Validar el formulario antes de enviar los datos
+            if (!validateForm()) {
+                return; // Detener la ejecución si la validación falla
+            }
+
+            // Obtener los datos del formulario
+            var name = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+            var nacimiento = document.getElementById('nacimiento').value;
+
+            // Crear el objeto jugador
+            var player = {
+                name: name,
+                email: email,
+                nacimiento: nacimiento
+            };
+
+            // Enviar los datos del jugador al servidor
+            fetch('https://alejandrocodev.000webhostapp.com/postUsers.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(player)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Mostrar mensaje de éxito
+                alert(data.message);
+                // Actualizar la lista de jugadores
+                getPlayerList();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Función para obtener y mostrar la lista de jugadores
+        function getPlayerList() {
+            fetch('https://alejandrocodev.000webhostapp.com/postUsers.php')
+            .then(response => response.json())
+            .then(data => {
+                // Construir la tabla de jugadores
+                var playerTable = '<table class="table"><thead><tr><th scope="col">Nombre</th><th scope="col">Fecha de nacimiento</th><th scope="col">Correo</th></tr></thead><tbody>';
+                data.forEach(player => {
+                    playerTable += '<tr>';
+                    playerTable += '<td>' + player.name + '</td>';
+                    playerTable += '<td>' + player.nacimiento + '</td>';
+                    playerTable += '<td>' + player.email + '</td>';
+                    playerTable += '</tr>';
+                });
+                playerTable += '</tbody></table>';
+                // Mostrar la tabla de jugadores en el contenedor correspondiente
+                document.getElementById('playerList').innerHTML = playerTable;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Llamar a la función para obtener y mostrar la lista de jugadores al cargar la página
+        getPlayerList();
+    </script>
+</body>
+</html>
