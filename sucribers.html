@@ -51,14 +51,137 @@
 
     <div class="row justify-content-center mt-5">
         <div class="col-md-8">
-            
-            
+            <h2 class="text-center">Suscriptores</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo Electrónico</th>
+                        <th>Fecha de Nacimiento</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaSuscriptores">
+                    <!-- Aquí se cargarán los datos de la tabla -->
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
-    
+
+    // Función para validar los datos del formulario
+    function validateForm() {
+        var name = document.getElementById('name').value.trim();
+        var email = document.getElementById('email').value.trim();
+        var nacimiento = document.getElementById('nacimiento').value.trim();
+
+        // Validar que no haya campos vacíos
+        if (name === '' || email === '' || nacimiento === '') {
+            alert('Por favor completa todos los campos.');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Función para agregar un nuevo jugador
+    document.getElementById('addPlayerForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Evitar que se envíe el formulario
+
+        // Validar el formulario antes de enviar los datos
+        if (!validateForm()) {
+            return; // Detener la ejecución si la validación falla
+        }
+
+        // Obtener los datos del formulario
+        var name = document.getElementById('name').value;
+        var email = document.getElementById('email').value;
+        var nacimiento = document.getElementById('nacimiento').value;
+        // Crear el objeto jugador
+        var player = {
+            playerName: playerName,
+            playerExp: playerExp,
+            playerEdad: playerEdad
+        };
+
+        // Enviar los datos del jugador al servidor
+        fetch('https://alejandrocodev.000webhostapp.com/postUsers.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(player)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Mostrar mensaje de éxito
+            alert(data.message);
+            // Actualizar la lista de jugadores
+            getPlayerList();
+        })
+        .catch(error => console.error('Error:', error));
+    });//
+        
+    $(document).ready(function () {
+        // Cargar datos de la tabla al cargar la página
+        cargarSuscriptores();
+
+        // Función para cargar datos de la tabla
+        function cargarSuscriptores() {
+            $.ajax({
+                type: 'GET',
+                url: 'https://alejandrocodev.000webhostapp.com/postUsers.php', 
+                dataType: 'json',
+                success: function (response) {
+                    mostrarSuscriptores(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        // Función para mostrar datos de la tabla
+        function mostrarSuscriptores(suscriptores) {
+            var tablaHTML = '';
+            suscriptores.forEach(function (suscriptor) {
+                tablaHTML += '<tr>';
+                tablaHTML += '<td>' + suscriptor.id + '</td>';
+                tablaHTML += '<td>' + suscriptor.name + '</td>';
+                tablaHTML += '<td>' + suscriptor.email + '</td>';
+                tablaHTML += '<td>' + suscriptor.nacimiento + '</td>';
+                tablaHTML += '</tr>';
+            });
+            $('#tablaSuscriptores').html(tablaHTML);
+        }
+
+        // Manejar envío del formulario
+        $('#registroForm').submit(function (event) {
+            event.preventDefault();
+            var formData = {
+                name: $('#name').val(),
+                email: $('#email').val(),
+                nacimiento: $('#nacimiento').val()
+            };
+            $.ajax({
+                type: 'POST',
+                url: 'https://alejandrocodev.000webhostapp.com/postUsers.php',
+                dataType: 'json',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#mensaje').html('<div class="alert alert-success">' + response.message + '</div>');
+                    $('#registroForm')[0].reset();
+                    cargarSuscriptores(); // Actualizar la tabla después de agregar un nuevo suscriptor
+                },
+                error: function (xhr, status, error) {
+                    $('#mensaje').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>

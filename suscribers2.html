@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player Management</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <style>
         body {
@@ -55,10 +54,6 @@
     </div>
 
     <script>
-    
-        const urlAdView = 'https://alejandrocodev.000webhostapp.com/postUsers.php'; 
-        const urlDelete = 'https://alejandrocodev.000webhostapp.com/eliminarUsers.php';
-        
         // Función para validar los datos del formulario
         function validateForm() {
             var name = document.getElementById('name').value.trim();
@@ -96,7 +91,7 @@
             };
 
             // Enviar los datos del jugador al servidor
-            fetch(urlAdView , {
+            fetch('https://alejandrocodev.000webhostapp.com/postUsers.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -107,38 +102,24 @@
             .then(data => {
                 // Mostrar mensaje de éxito
                 alert(data.message);
-                // Limpiar el formulario
-                clearForm();
                 // Actualizar la lista de jugadores
                 getPlayerList();
             })
             .catch(error => console.error('Error:', error));
         });
 
-        // Función para limpiar el formulario después de enviarlo con éxito
-        function clearForm() {
-            document.getElementById('name').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('nacimiento').value = '';
-        }
-
         // Función para obtener y mostrar la lista de jugadores
         function getPlayerList() {
-            fetch(urlAdView)
+            fetch('https://alejandrocodev.000webhostapp.com/postUsers.php')
             .then(response => response.json())
             .then(data => {
                 // Construir la tabla de jugadores
-                var playerTable = '<table class="table"><thead><tr><th scope="col">Nombre</th><th scope="col">Fecha de nacimiento</th><th scope="col">Correo</th><th scope="col">Acciones</th></tr></thead><tbody>';
+                var playerTable = '<table class="table"><thead><tr><th scope="col">Nombre</th><th scope="col">Fecha de nacimiento</th><th scope="col">Correo</th></tr></thead><tbody>';
                 data.forEach(player => {
-                    // Formatear la fecha en dd/mm/aaaa sin ajuste de zona horaria
-                    var birthDateParts = player.nacimiento.split('-'); // Dividir la fecha en partes (año, mes, día)
-                    var formattedDate = `${birthDateParts[2]}/${birthDateParts[1]}/${birthDateParts[0]}`;
-                    
                     playerTable += '<tr>';
                     playerTable += '<td>' + player.name + '</td>';
-                    playerTable += '<td>' + formattedDate + '</td>';
+                    playerTable += '<td>' + player.nacimiento + '</td>';
                     playerTable += '<td>' + player.email + '</td>';
-                    playerTable += '<td><button class="btn btn-danger" onclick="deletePlayer(\'' + player.email + '\')"><i class="fas fa-trash"></i></button></td>';
                     playerTable += '</tr>';
                 });
                 playerTable += '</tbody></table>';
@@ -146,27 +127,6 @@
                 document.getElementById('playerList').innerHTML = playerTable;
             })
             .catch(error => console.error('Error:', error));
-        }
-
-        // Función para eliminar un jugador por su correo electrónico
-        function deletePlayer(email) {
-            if (confirm('¿Estás seguro de que deseas eliminar este suscriptor?')) {
-                fetch(urlDelete , {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email: email })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Mostrar mensaje de éxito
-                    alert(data.message);
-                    // Actualizar la lista de jugadores
-                    getPlayerList();
-                })
-                .catch(error => console.error('Error:', error));
-            }
         }
 
         // Llamar a la función para obtener y mostrar la lista de jugadores al cargar la página
