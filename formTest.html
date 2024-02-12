@@ -81,7 +81,7 @@
         <label for="playerName">Nombre:</label>
         <input type="text" id="playerName" name="playerName" required><br><br>
 
-        <label for="playerExp">Experiencia:</label>
+        <label for="playerExp">Score:</label>
         <input type="number" id="playerExp" name="playerExp" required><br><br>
 
         <label for="playerEdad">Edad:</label>
@@ -162,11 +162,13 @@
             .then(data => {
                 // Construir la lista de jugadores
                 var playerList = '';
-                data.forEach(player => {
+                // Limitar la cantidad de jugadores a mostrar
+                var playersToShow = data.slice(0, 10); // Obtener los primeros 10 jugadores
+                playersToShow.forEach(player => {
                     playerList += '<div>';
                     playerList += '<strong>Nombre:</strong> ' + player.playerName + ', ';
                     playerList += '<strong>Edad:</strong> ' + player.playerEdad + ', ';
-                    playerList += '<strong>Experiencia:</strong> ' + player.playerExp;
+                    playerList += '<strong>Score:</strong> ' + parseInt(player.playerExp).toLocaleString(); // Formatear el score
                     playerList += '</div>';
                 });
                 // Mostrar la lista de jugadores en el contenedor correspondiente
@@ -174,6 +176,7 @@
             })
             .catch(error => console.error('Error:', error));
         }
+
 
         // Llamar a la función para obtener y mostrar la lista de jugadores al cargar la página
         getPlayerList();
